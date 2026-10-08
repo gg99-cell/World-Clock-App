@@ -3,6 +3,7 @@
   --surface: #ffffff;
   --surface-2: #eef0f5;
   --face-night: #d3d6dc;
+  --moon: #4f5f82;
   --text: #1b1f2a;
   --muted: #5f6677;
   --border: #dde1ea;
@@ -22,6 +23,7 @@
     --surface: #1c1f28;
     --surface-2: #262a35;
     --face-night: #34363c;
+    --moon: #ecd98a;
     --text: #e9ecf3;
     --muted: #9aa2b4;
     --border: #2f3442;
@@ -40,6 +42,7 @@
   --surface: #1c1f28;
   --surface-2: #262a35;
   --face-night: #34363c;
+  --moon: #ecd98a;
   --text: #e9ecf3;
   --muted: #9aa2b4;
   --border: #2f3442;
@@ -79,11 +82,44 @@ body {
 }
 
 /* Header */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
 .header h1 {
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 1.75rem;
   letter-spacing: -0.02em;
 }
+
+.hour-toggle {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+.hour-toggle button {
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.hour-toggle button[aria-pressed="true"] {
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.hour-toggle button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 .sim-banner {
   margin: -8px 0 20px;
@@ -241,6 +277,12 @@ body {
 .face { fill: var(--surface-2); stroke: var(--border); stroke-width: 2; }
 .clock .face { transition: fill 2s ease; }
 .clock.night .face { fill: var(--face-night); }
+.sun, .moon { transition: opacity 2s ease; }
+.moon { fill: var(--moon); opacity: 0; }
+.clock.night .moon { opacity: 1; }
+.sun-core { fill: #f5b301; }
+.sun-ray { stroke: #f5b301; stroke-width: 2.5; stroke-linecap: round; }
+.clock.night .sun { opacity: 0; }
 .tick { stroke: var(--muted); stroke-width: 1; stroke-linecap: round; }
 .tick-major { stroke: var(--text); stroke-width: 3; }
 .num { fill: var(--text); font-size: 15px; font-weight: 600; dominant-baseline: central; }

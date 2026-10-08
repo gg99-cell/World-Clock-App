@@ -104,8 +104,16 @@ function formatDifference(minutes) {
   return `${parts.join(' ')} ${minutes > 0 ? 'ahead of' : 'behind'} you`;
 }
 
+// 12 or 24-hour digital times; the choice is remembered in this browser.
+let use12Hour = false;
+try { use12Hour = localStorage.getItem('hourFormat') === '12'; } catch { /* storage unavailable */ }
+
 const pad = (n) => String(n).padStart(2, '0');
-const formatTime = (p) => `${pad(p.hour)}:${pad(p.minute)}:${pad(p.second)}`;
+function formatTime(p, withSeconds = true) {
+  const sec = withSeconds ? `:${pad(p.second)}` : '';
+  if (!use12Hour) return `${pad(p.hour)}:${pad(p.minute)}${sec}`;
+  return `${p.hour % 12 || 12}:${pad(p.minute)}${sec} ${p.hour < 12 ? 'AM' : 'PM'}`;
+}
 
 // ---------- Place helpers ----------
 const regionNames = (() => {
@@ -173,6 +181,23 @@ function buildClock(svg) {
     const [x, y] = polar(67, n * 30);
     svg.appendChild(svgEl('text', { x, y, class: 'num', 'text-anchor': 'middle' }, n));
   }
+  // Sun by day, crescent moon by night, between the centre and the 6; CSS shows one.
+  const sun = svgEl('g', { class: 'sun' });
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    sun.appendChild(svgEl('line', {
+      x1: 100 + 10 * Math.cos(a), y1: 140 + 10 * Math.sin(a),
+      x2: 100 + 14 * Math.cos(a), y2: 140 + 14 * Math.sin(a),
+      class: 'sun-ray',
+    }));
+  }
+  sun.appendChild(svgEl('circle', { cx: 100, cy: 140, r: 7, class: 'sun-core' }));
+  const moon = svgEl('path', {
+    class: 'moon',
+    d: 'M104 131 A10 10 0 1 0 104 149 A12 12 0 0 1 104 131 Z',
+    transform: 'rotate(-20 100 140)',
+  });
+  svg.append(sun, moon);
   const hands = {
     hour: svgEl('line', { class: 'hand hand-hour', x1: 100, y1: 112, x2: 100, y2: 52 }),
     minute: svgEl('line', { class: 'hand hand-minute', x1: 100, y1: 116, x2: 100, y2: 30 }),
@@ -224,7 +249,7 @@ function renderMyCities(date) {
   for (const view of myCityViews) {
     const p = zonedParts(date, view.place.timezone);
     setHands(view.hands, p);
-    view.time.textContent = `Time in ${view.place.name}: ${formatTime(p).slice(0, 5)}`;
+    view.time.textContent = `Time in ${view.place.name}: ${formatTime(p, false)}`;
     view.dayDate.textContent = formatDayDate(p);
   }
 }
@@ -284,7 +309,7 @@ function render() {
   const localOffset = -date.getTimezoneOffset();
   $('city-diff').textContent = formatDifference(p.offsetMinutes - localOffset);
 
-  document.title = `${formatTime(p).slice(0, 5)} ${currentPlace.name} · World Clock`;
+  document.title = `${formatTime(p, false)} ${currentPlace.name} · World Clock`;
 }
 
 function tick() {
@@ -343,7 +368,7 @@ function renderList() {
 
     const time = document.createElement('span');
     time.className = 'option-time';
-    time.textContent = formatTime(zonedParts(date, place.timezone)).slice(0, 5);
+    time.textContent = formatTime(zonedParts(date, place.timezone), false);
 
     li.append(text, time);
     li.addEventListener('pointerdown', (e) => {
@@ -450,10 +475,26 @@ function currentPlaceMatchesInput() {
   return currentPlace && input.value === currentPlace.name;
 }
 
+// ---------- 12/24-hour toggle ----------
+const toggleButtons = document.querySelectorAll('.hour-toggle button');
+
+function updateToggle() {
+  toggleButtons.forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.format === '12') === use12Hour)));
+}
+
+toggleButtons.forEach((button) => button.addEventListener('click', () => {
+  use12Hour = button.dataset.format === '12';
+  try { localStorage.setItem('hourFormat', use12Hour ? '12' : '24'); } catch { /* storage unavailable */ }
+  updateToggle();
+  render();
+  if (!list.hidden) renderList();
+}));
+
 // ---------- Start ----------
 mainHands = buildClock($('main-clock'));
 buildWeekDial();
 buildMyCities();
+updateToggle();
 if (!Number.isNaN(simStart)) {
   const banner = $('sim-banner');
   banner.textContent = `Simulated clock: started at ${new Date(simStart).toISOString()}. Remove ?now= from the address to use the real time.`;

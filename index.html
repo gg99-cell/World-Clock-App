@@ -10,7 +10,13 @@
 <body>
   <main class="app">
     <header class="header">
-      <h1>World Clock</h1>
+      <div class="header-row">
+        <h1>World Clock</h1>
+        <div class="hour-toggle" role="group" aria-label="Clock format">
+          <button type="button" data-format="12" aria-pressed="false">12h</button>
+          <button type="button" data-format="24" aria-pressed="true">24h</button>
+        </div>
+      </div>
       <p id="sim-banner" class="sim-banner" hidden></p>
     </header>
 
