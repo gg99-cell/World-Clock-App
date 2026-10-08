@@ -161,6 +161,7 @@ function polar(r, angleDeg) {
 
 // Draws a clock face into an empty 200×200 SVG and returns its three hands.
 function buildClock(svg) {
+  svg.classList.add('clock');
   svg.appendChild(svgEl('circle', { class: 'face', cx: 100, cy: 100, r: 94 }));
   for (let i = 0; i < 60; i++) {
     const major = i % 5 === 0;
@@ -188,6 +189,8 @@ function setHands(hands, p) {
   turn(hands.hour, (p.hour % 12 + p.minute / 60 + p.second / 3600) * 30);
   turn(hands.minute, (p.minute + p.second / 60) * 6);
   turn(hands.second, p.second * 6);
+  // Evening and night (18:00–05:59 local) get a slightly gray face.
+  hands.hour.ownerSVGElement.classList.toggle('night', p.hour >= 18 || p.hour < 6);
 }
 
 const formatDayDate = (p) => `${WEEKDAYS[p.weekday]}, ${p.day} ${MONTHS[p.month - 1]} ${p.year}`;

@@ -2,6 +2,7 @@
   --bg: #f4f5f8;
   --surface: #ffffff;
   --surface-2: #eef0f5;
+  --face-night: #d3d6dc;
   --text: #1b1f2a;
   --muted: #5f6677;
   --border: #dde1ea;
@@ -20,6 +21,7 @@
     --bg: #12141a;
     --surface: #1c1f28;
     --surface-2: #262a35;
+    --face-night: #34363c;
     --text: #e9ecf3;
     --muted: #9aa2b4;
     --border: #2f3442;
@@ -37,6 +39,7 @@
   --bg: #12141a;
   --surface: #1c1f28;
   --surface-2: #262a35;
+  --face-night: #34363c;
   --text: #e9ecf3;
   --muted: #9aa2b4;
   --border: #2f3442;
@@ -236,6 +239,8 @@ body {
 
 /* SVG parts */
 .face { fill: var(--surface-2); stroke: var(--border); stroke-width: 2; }
+.clock .face { transition: fill 2s ease; }
+.clock.night .face { fill: var(--face-night); }
 .tick { stroke: var(--muted); stroke-width: 1; stroke-linecap: round; }
 .tick-major { stroke: var(--text); stroke-width: 3; }
 .num { fill: var(--text); font-size: 15px; font-weight: 600; dominant-baseline: central; }
