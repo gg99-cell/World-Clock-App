@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Clock</title>
+  <meta name="description" content="Type a city and see its current day, date and time as analog and digital displays.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <h1>World Clock</h1>
+      <p id="sim-banner" class="sim-banner" hidden></p>
+    </header>
+
+    <div class="search" id="search">
+      <label for="city-input" class="visually-hidden">City</label>
+      <div class="search-field">
+        <input
+          id="city-input"
+          type="text"
+          placeholder="Type a city…"
+          autocomplete="off"
+          spellcheck="false"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded="false"
+          aria-controls="city-list"
+        >
+        <ul id="city-list" class="city-list" role="listbox" hidden></ul>
+      </div>
+      <p id="search-status" class="search-status" role="status" aria-live="polite"></p>
+    </div>
+
+    <p id="empty-state" class="empty-state">Search for a city to see its local time</p>
+
+    <section id="city-view" class="city-view" hidden>
+      <div class="city-line">
+        <h2 id="city-name" class="city-name"></h2>
+        <p id="city-zone" class="city-zone"></p>
+        <p id="city-diff" class="city-diff"></p>
+      </div>
+
+      <div class="cards">
+        <!-- Time card -->
+        <article class="card" aria-labelledby="time-text">
+          <h3 class="card-title">Time</h3>
+          <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="face" cx="100" cy="100" r="94"/>
+            <g id="clock-ticks"></g>
+            <g id="clock-numbers"></g>
+            <line id="hand-hour" class="hand hand-hour" x1="100" y1="112" x2="100" y2="52"/>
+            <line id="hand-minute" class="hand hand-minute" x1="100" y1="116" x2="100" y2="30"/>
+            <line id="hand-second" class="hand hand-second" x1="100" y1="122" x2="100" y2="22"/>
+            <circle class="hub" cx="100" cy="100" r="5"/>
+            <circle class="hub-inner" cx="100" cy="100" r="2"/>
+          </svg>
+          <p id="time-text" class="digital digital-time">--:--:--</p>
+        </article>
+
+        <!-- Date card -->
+        <article class="card" aria-labelledby="date-text">
+          <h3 class="card-title">Date</h3>
+          <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+            <rect class="page-shadow" x="26" y="30" width="152" height="160" rx="12"/>
+            <rect class="page" x="22" y="24" width="156" height="160" rx="12"/>
+            <path class="band" d="M22 36 a12 12 0 0 1 12 -12 h132 a12 12 0 0 1 12 12 v34 h-156 z"/>
+            <text id="cal-month" class="cal-month" x="100" y="55" text-anchor="middle">MONTH</text>
+            <line class="perforation" x1="30" y1="76" x2="170" y2="76"/>
+            <text id="cal-day" class="cal-day" x="100" y="146" text-anchor="middle">--</text>
+            <text id="cal-year" class="cal-year" x="100" y="172" text-anchor="middle">----</text>
+            <rect class="ring" x="58" y="14" width="8" height="20" rx="4"/>
+            <rect class="ring" x="134" y="14" width="8" height="20" rx="4"/>
+          </svg>
+          <p id="date-text" class="digital">--</p>
+        </article>
+
+        <!-- Day card -->
+        <article class="card" aria-labelledby="day-text">
+          <h3 class="card-title">Day</h3>
+          <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="face" cx="100" cy="100" r="94"/>
+            <g id="week-labels"></g>
+            <line id="hand-week" class="hand hand-week" x1="100" y1="112" x2="100" y2="48"/>
+            <circle class="hub" cx="100" cy="100" r="5"/>
+            <circle class="hub-inner" cx="100" cy="100" r="2"/>
+          </svg>
+          <p id="day-text" class="digital">--</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
