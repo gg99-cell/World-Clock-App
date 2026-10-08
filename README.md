@@ -2,6 +2,8 @@
 
 Type a city name and see its current time, date and day of the week, each as an analog display and as digital text, updating every second.
 
+Below that, a **My cities** section always shows Chennai, Manchester and Austin, Texas, each with an analog clock and its day and date. Edit `MY_CITIES` in `app.js` to change them.
+
 Plain HTML, CSS and JavaScript. No installs, no API keys. Open `index.html` in a browser, or deploy the folder as-is to Vercel.
 
 - City lookup: [Open-Meteo geocoding](https://open-meteo.com/en/docs/geocoding-api) (free, no key). Places it doesn't know (such as Kiritimati) are added in `EXTRA_PLACES` in `app.js`.

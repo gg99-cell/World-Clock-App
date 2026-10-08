@@ -27,6 +27,13 @@ const EXTRA_PLACES = [
   },
 ];
 
+// Always-visible cities. Their official time zones are fixed, so no lookup is needed.
+const MY_CITIES = [
+  { name: 'Chennai', admin1: 'Tamil Nadu', country: 'India', timezone: 'Asia/Kolkata' },
+  { name: 'Manchester', admin1: 'England', country: 'United Kingdom', timezone: 'Europe/London' },
+  { name: 'Austin', admin1: 'Texas', country: 'United States', timezone: 'America/Chicago' },
+];
+
 // ---------- Clock source ----------
 // The device clock is "now". For testing, ?now=<ISO time> starts a simulated
 // clock at that moment which then runs forward in real time.
@@ -152,18 +159,70 @@ function polar(r, angleDeg) {
   return [100 + r * Math.cos(a), 100 + r * Math.sin(a)];
 }
 
-function buildClockFace() {
-  const ticks = $('clock-ticks');
+// Draws a clock face into an empty 200×200 SVG and returns its three hands.
+function buildClock(svg) {
+  svg.appendChild(svgEl('circle', { class: 'face', cx: 100, cy: 100, r: 94 }));
   for (let i = 0; i < 60; i++) {
     const major = i % 5 === 0;
     const [x1, y1] = polar(major ? 80 : 84, i * 6);
     const [x2, y2] = polar(88, i * 6);
-    ticks.appendChild(svgEl('line', { x1, y1, x2, y2, class: major ? 'tick tick-major' : 'tick' }));
+    svg.appendChild(svgEl('line', { x1, y1, x2, y2, class: major ? 'tick tick-major' : 'tick' }));
   }
-  const numbers = $('clock-numbers');
   for (let n = 1; n <= 12; n++) {
     const [x, y] = polar(67, n * 30);
-    numbers.appendChild(svgEl('text', { x, y, class: 'num', 'text-anchor': 'middle' }, n));
+    svg.appendChild(svgEl('text', { x, y, class: 'num', 'text-anchor': 'middle' }, n));
+  }
+  const hands = {
+    hour: svgEl('line', { class: 'hand hand-hour', x1: 100, y1: 112, x2: 100, y2: 52 }),
+    minute: svgEl('line', { class: 'hand hand-minute', x1: 100, y1: 116, x2: 100, y2: 30 }),
+    second: svgEl('line', { class: 'hand hand-second', x1: 100, y1: 122, x2: 100, y2: 22 }),
+  };
+  svg.append(hands.hour, hands.minute, hands.second,
+    svgEl('circle', { class: 'hub', cx: 100, cy: 100, r: 5 }),
+    svgEl('circle', { class: 'hub-inner', cx: 100, cy: 100, r: 2 }));
+  return hands;
+}
+
+function setHands(hands, p) {
+  const turn = (el, deg) => el.setAttribute('transform', `rotate(${deg} 100 100)`);
+  turn(hands.hour, (p.hour % 12 + p.minute / 60 + p.second / 3600) * 30);
+  turn(hands.minute, (p.minute + p.second / 60) * 6);
+  turn(hands.second, p.second * 6);
+}
+
+const formatDayDate = (p) => `${WEEKDAYS[p.weekday]}, ${p.day} ${MONTHS[p.month - 1]} ${p.year}`;
+
+let mainHands = null;
+const myCityViews = [];
+
+function buildMyCities() {
+  const container = $('my-cities');
+  for (const place of MY_CITIES) {
+    const card = document.createElement('article');
+    card.className = 'card';
+    const title = document.createElement('h3');
+    title.className = 'mini-city';
+    title.textContent = place.name;
+    const where = document.createElement('p');
+    where.className = 'mini-place';
+    where.textContent = placeDetails(place);
+    const svg = svgEl('svg', { class: 'dial', viewBox: '0 0 200 200', 'aria-hidden': 'true' });
+    const time = document.createElement('p');
+    time.className = 'visually-hidden';
+    const dayDate = document.createElement('p');
+    dayDate.className = 'mini-daydate';
+    card.append(title, where, svg, time, dayDate);
+    container.appendChild(card);
+    myCityViews.push({ place, hands: buildClock(svg), time, dayDate });
+  }
+}
+
+function renderMyCities(date) {
+  for (const view of myCityViews) {
+    const p = zonedParts(date, view.place.timezone);
+    setHands(view.hands, p);
+    view.time.textContent = `Time in ${view.place.name}: ${formatTime(p).slice(0, 5)}`;
+    view.dayDate.textContent = formatDayDate(p);
   }
 }
 
@@ -195,14 +254,14 @@ function rotate(id, deg) {
 let currentPlace = null;
 
 function render() {
-  if (!currentPlace) return;
+  // One "now" for every display, so all cities tick in the same second.
   const date = now();
+  renderMyCities(date);
+  if (!currentPlace) return;
   const p = zonedParts(date, currentPlace.timezone);
 
   // Time
-  rotate('hand-hour', (p.hour % 12 + p.minute / 60 + p.second / 3600) * 30);
-  rotate('hand-minute', (p.minute + p.second / 60) * 6);
-  rotate('hand-second', p.second * 6);
+  setHands(mainHands, p);
   $('time-text').textContent = formatTime(p);
 
   // Date
@@ -389,8 +448,9 @@ function currentPlaceMatchesInput() {
 }
 
 // ---------- Start ----------
-buildClockFace();
+mainHands = buildClock($('main-clock'));
 buildWeekDial();
+buildMyCities();
 if (!Number.isNaN(simStart)) {
   const banner = $('sim-banner');
   banner.textContent = `Simulated clock: started at ${new Date(simStart).toISOString()}. Remove ?now= from the address to use the real time.`;

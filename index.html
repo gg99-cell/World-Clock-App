@@ -46,16 +46,7 @@
         <!-- Time card -->
         <article class="card" aria-labelledby="time-text">
           <h3 class="card-title">Time</h3>
-          <svg class="dial" viewBox="0 0 200 200" aria-hidden="true">
-            <circle class="face" cx="100" cy="100" r="94"/>
-            <g id="clock-ticks"></g>
-            <g id="clock-numbers"></g>
-            <line id="hand-hour" class="hand hand-hour" x1="100" y1="112" x2="100" y2="52"/>
-            <line id="hand-minute" class="hand hand-minute" x1="100" y1="116" x2="100" y2="30"/>
-            <line id="hand-second" class="hand hand-second" x1="100" y1="122" x2="100" y2="22"/>
-            <circle class="hub" cx="100" cy="100" r="5"/>
-            <circle class="hub-inner" cx="100" cy="100" r="2"/>
-          </svg>
+          <svg id="main-clock" class="dial" viewBox="0 0 200 200" aria-hidden="true"></svg>
           <p id="time-text" class="digital digital-time">--:--:--</p>
         </article>
 
@@ -89,6 +80,11 @@
           <p id="day-text" class="digital">--</p>
         </article>
       </div>
+    </section>
+
+    <section class="my-cities" aria-labelledby="my-cities-title">
+      <h2 id="my-cities-title" class="section-title">My cities</h2>
+      <div id="my-cities" class="cards"></div>
     </section>
   </main>
 

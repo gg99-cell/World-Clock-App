@@ -262,3 +262,32 @@ body {
 .week-label.today { fill: var(--accent); font-weight: 800; }
 .week-pill { fill: none; }
 .week-pill.today { fill: var(--accent-soft); }
+
+/* My cities */
+.my-cities {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.section-title {
+  margin: 0 0 16px;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+.mini-city {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.mini-place {
+  margin: 2px 0 12px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.my-cities .dial { max-width: 200px; }
+.mini-daydate {
+  margin: 12px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-align: center;
+}
